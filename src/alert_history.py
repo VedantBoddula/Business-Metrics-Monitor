@@ -77,8 +77,18 @@ def send_alert_once(
         status="pending",
     )
 
+    
     try:
-        send_email_alert(subject=subject, body=summary)
+        email_sent = send_email_alert(
+            subject=subject,
+            body=summary,
+        )
+
+        if not email_sent:
+            raise RuntimeError(
+                "Email function reported that sending failed."
+            )
+
     except Exception as exc:
         record_alert(
             alert_key=alert_key,
@@ -102,6 +112,7 @@ def send_alert_once(
 
     print(f"Alert email sent and recorded: {alert_key}")
     return True
+
 
 def get_alert_history():
     with sqlite3.connect(DB_PATH) as conn:

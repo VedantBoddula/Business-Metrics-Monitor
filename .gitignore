@@ -1,0 +1,6 @@
+.env
+__pycache__/
+*.py[cod]
+alert_history.db
+.venv/
+venv/
