@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 from pathlib import Path
@@ -57,6 +56,7 @@ page = st.sidebar.radio(
         "Overview",
         "Sales Analytics",
         "Anomaly Detection",
+        "Business Impact",
         "Alert History"
     ]
 )
@@ -622,6 +622,76 @@ elif page == "Anomaly Detection":
                 "the anomaly detector module. Detected events are "
                 "candidates for investigation, not proof of a business problem."
             )
+
+
+
+
+
+
+elif page == "Business Impact":
+    st.subheader("💼 Business Impact Analysis")
+
+    st.write(
+        "Understand the potential business impact of detected "
+        "sales anomalies and profit margin changes."
+    )
+
+    # Overall business metrics
+    total_sales = df["Sales"].sum()
+    total_profit = df["Profit"].sum()
+    total_orders = df["Order_ID"].nunique()
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        st.metric("Total Revenue", f"₹{total_sales:,.0f}")
+
+    with col2:
+        st.metric("Total Profit", f"₹{total_profit:,.0f}")
+
+    with col3:
+        st.metric("Total Orders", f"{total_orders:,}")
+
+    st.divider()
+
+    st.markdown("### Revenue by Category")
+
+    category_impact = (
+        df.groupby("Category", as_index=False)
+        .agg(
+            Revenue=("Sales", "sum"),
+            Profit=("Profit", "sum")
+        )
+        .sort_values("Revenue", ascending=False)
+    )
+
+    st.bar_chart(
+        category_impact.set_index("Category")[["Revenue", "Profit"]]
+    )
+
+    st.markdown("### Revenue by Region")
+
+    region_impact = (
+        df.groupby("Region", as_index=False)
+        .agg(
+            Revenue=("Sales", "sum"),
+            Profit=("Profit", "sum")
+        )
+        .sort_values("Revenue", ascending=False)
+    )
+
+    st.bar_chart(
+        region_impact.set_index("Region")[["Revenue", "Profit"]]
+    )
+
+    st.markdown("### Category Performance")
+
+    st.dataframe(
+        category_impact,
+        use_container_width=True,
+        hide_index=True
+    )
+
 
 
 # Alert History page
