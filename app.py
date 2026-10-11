@@ -239,12 +239,58 @@ elif page == "Anomaly Detection":
     add_events(margin_drops, "Profit Margin Drop", "Category")
     add_events(regional_drops, "Regional Sales Drop", "Region")
 
+
+    
+    # Assign severity using transparent, configurable rules
+    def assign_severity(row):
+        anomaly_type = row["Anomaly Type"]
+        sales_change = row.get("Sales Change (%)")
+        margin_drop = row.get("Margin Drop (pp)")
+
+        if anomaly_type in [
+            "Overall Sales Drop",
+            "Regional Sales Drop"
+        ] and pd.notna(sales_change):
+            if sales_change <= -40:
+                return "Critical"
+            elif sales_change <= -30:
+                return "High"
+            return "Moderate"
+
+        if anomaly_type == "Profit Margin Drop" and pd.notna(margin_drop):
+            if margin_drop <= -15:
+                return "Critical"
+            elif margin_drop <= -8:
+                return "High"
+            return "Moderate"
+
+        if pd.notna(sales_change):
+            magnitude = abs(sales_change)
+            if magnitude >= 200:
+                return "Critical"
+            elif magnitude >= 100:
+                return "High"
+
+        return "Moderate"
+
+
     if not events:
         st.success("No anomalies were detected with the current rules.")
     else:
-        results = pd.DataFrame(events).sort_values(
+        
+        results = pd.DataFrame(events)
+
+        results["Severity"] = results.apply(
+            assign_severity, axis=1
+        )
+
+        results = results.sort_values(
             "Start Date", ascending=False
         )
+
+        
+        
+        
 
         col1, col2 = st.columns(2)
 
@@ -257,7 +303,31 @@ elif page == "Anomaly Detection":
                 results["Anomaly Type"].nunique()
             )
 
+        
+
+        # Severity Summary
+        st.markdown("### Severity Summary")
+        
+        critical_count = (results["Severity"] == "Critical").sum()
+        high_count = (results["Severity"] == "High").sum()
+        moderate_count = (results["Severity"] == "Moderate").sum()
+        
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.metric("🔴 Critical", critical_count)
+        
+        with col2:
+            st.metric("🟠 High", high_count)
+        
+        with col3:
+            st.metric("🟡 Moderate", moderate_count)
+
+
         st.divider()
+        
+        
+        
 
         anomaly_types = ["All"] + sorted(
             results["Anomaly Type"].unique().tolist()
@@ -268,7 +338,21 @@ elif page == "Anomaly Detection":
             anomaly_types
         )
 
+        
+        severity_options = ["All", "Critical", "High", "Moderate"]
+
+        selected_severity = st.selectbox(
+            "Filter by severity",
+            severity_options
+        )
+
         filtered_results = results.copy()
+
+        if selected_severity != "All":
+            filtered_results = filtered_results[
+                filtered_results["Severity"] == selected_severity
+            ]
+
 
         if selected_anomaly != "All":
             filtered_results = filtered_results[
@@ -282,6 +366,254 @@ elif page == "Anomaly Detection":
             use_container_width=True,
             hide_index=True
         )
+
+
+        
+        # Interactive anomaly investigation
+        st.divider()
+        st.subheader("🔎 Investigate an Anomaly")
+        st.caption(
+            "Select a detected event to inspect its metrics, "
+            "historical baseline, and business impact."
+        )
+
+        if filtered_results.empty:
+            st.info("No events available for investigation.")
+        else:
+            investigation_data = filtered_results.reset_index(drop=True)
+
+            selected_index = st.selectbox(
+                "Choose an event",
+                options=investigation_data.index.tolist(),
+                format_func=lambda i: (
+                    f"{investigation_data.loc[i, 'Anomaly Type']} | "
+                    f"{investigation_data.loc[i, 'Scope']} | "
+                    f"{investigation_data.loc[i, 'Start Date']:%Y-%m-%d} "
+                    f"to "
+                    f"{investigation_data.loc[i, 'End Date']:%Y-%m-%d}"
+                ),
+                key="investigation_event"
+            )
+
+            event = investigation_data.loc[selected_index]
+
+            anomaly_type = event["Anomaly Type"]
+            scope = event["Scope"]
+            severity = event["Severity"]
+            start_date = event["Start Date"]
+            end_date = event["End Date"]
+
+            st.markdown("### Event Details")
+            if severity == "Critical":
+                st.error(f"🚨 Severity: {severity}")
+            elif severity == "High":
+                st.warning(f"⚠️ Severity: {severity}")
+            else:
+                st.info(f"ℹ️ Severity: {severity}")
+
+            detail1, detail2, detail3 = st.columns(3)
+            detail1.metric("Anomaly Type", anomaly_type)
+            detail2.metric("Duration", f"{event['Duration (days)']} days")
+            detail3.write(
+                f"**Period**\n\n"
+                f"{start_date:%d %b %Y} – {end_date:%d %b %Y}"
+            )
+
+            # Select the correct data and baseline for this event
+            if anomaly_type in [
+                "Overall Sales Drop",
+                "Overall Sales Spike"
+            ]:
+                detail_data = daily_data[
+                    (daily_data["Date"] >= start_date)
+                    & (daily_data["Date"] <= end_date)
+                ].copy()
+
+                metric_column = "Sales"
+                baseline_column = "Sales_4week_Avg"
+                metric_label = "Sales"
+                quantity_column = "Quantity"
+                quantity_baseline = "Quantity_4week_Avg"
+
+            elif anomaly_type == "Regional Sales Drop":
+                detail_data = region_daily[
+                    (region_daily["Region"] == scope)
+                    & (region_daily["Date"] >= start_date)
+                    & (region_daily["Date"] <= end_date)
+                ].copy()
+
+                metric_column = "Sales"
+                baseline_column = "Same_Day_4week_Avg"
+                metric_label = "Sales"
+                quantity_column = None
+                quantity_baseline = None
+
+            elif anomaly_type == "Product Sales Spike":
+                detail_data = product_daily[
+                    (product_daily["Product_Name"] == scope)
+                    & (product_daily["Date"] >= start_date)
+                    & (product_daily["Date"] <= end_date)
+                ].copy()
+
+                metric_column = "Sales"
+                baseline_column = "Same_Day_4week_Avg"
+                metric_label = "Sales"
+                quantity_column = "Quantity"
+                quantity_baseline = "Quantity_4week_Avg"
+
+            else:
+                # Category sales spike or profit margin drop
+                detail_data = category_daily[
+                    (category_daily["Category"] == scope)
+                    & (category_daily["Date"] >= start_date)
+                    & (category_daily["Date"] <= end_date)
+                ].copy()
+
+                if anomaly_type == "Profit Margin Drop":
+                    metric_column = "Profit_Margin_pct"
+                    baseline_column = "Profit_Margin_4week_Avg"
+                    metric_label = "Profit Margin (%)"
+                else:
+                    metric_column = "Sales"
+                    baseline_column = "Same_Day_4week_Avg"
+                    metric_label = "Sales"
+
+                quantity_column = "Quantity"
+                quantity_baseline = "Quantity_4week_Avg"
+
+            if detail_data.empty:
+                st.warning("No matching daily records were found for this event.")
+            else:
+                actual_total = detail_data[metric_column].sum()
+
+                # Compare averages for percentage-based metrics,
+                # and totals for sales/quantity metrics.
+                if metric_column == "Profit_Margin_pct":
+                    actual_value = detail_data[metric_column].mean()
+                    baseline_value = detail_data[baseline_column].mean()
+                    value_format = "{:.2f}%"
+                else:
+                    actual_value = detail_data[metric_column].sum()
+                    baseline_value = detail_data[baseline_column].sum()
+                    value_format = "₹{:,.0f}" if metric_column == "Sales" else "{:,.0f}"
+
+                if pd.notna(baseline_value) and baseline_value != 0:
+                    change_pct = (
+                        (actual_value - baseline_value)
+                        / abs(baseline_value)
+                    ) * 100
+                else:
+                    change_pct = None
+
+                st.markdown("### Actual vs Historical Baseline")
+
+                metric1, metric2, metric3 = st.columns(3)
+
+                metric1.metric(
+                    f"Actual {metric_label}",
+                    value_format.format(actual_value)
+                )
+
+                metric2.metric(
+                    f"Baseline {metric_label}",
+                    value_format.format(baseline_value)
+                    if pd.notna(baseline_value)
+                    else "Unavailable"
+                )
+
+                metric3.metric(
+                    "Change vs Baseline",
+                    f"{change_pct:+.1f}%"
+                    if change_pct is not None
+                    else "Unavailable"
+                )
+
+                # Plot the actual values against the historical baseline
+                chart_columns = [metric_column, baseline_column]
+
+                chart_data = detail_data[
+                    ["Date"] + chart_columns
+                ].copy()
+
+                chart_data = chart_data.sort_values("Date")
+                chart_data = chart_data.set_index("Date")
+
+                chart_data = chart_data.rename(columns={
+                    metric_column: f"Actual {metric_label}",
+                    baseline_column: f"Historical Baseline ({metric_label})"
+                })
+
+                st.line_chart(
+                    chart_data,
+                    x_label="Date",
+                    y_label=metric_label
+                )
+
+                # Show supporting business metrics
+                if "Profit" in detail_data.columns:
+                    total_profit = detail_data["Profit"].sum()
+                    st.metric("Total Profit During Event", f"₹{total_profit:,.2f}")
+
+                if (
+                    quantity_column
+                    and quantity_column in detail_data.columns
+                    and quantity_baseline in detail_data.columns
+                ):
+                    actual_quantity = detail_data[quantity_column].sum()
+                    baseline_quantity = detail_data[quantity_baseline].sum()
+
+                    q1, q2 = st.columns(2)
+                    q1.metric("Units Sold", f"{actual_quantity:,.0f}")
+                    q2.metric(
+                        "Baseline Units",
+                        f"{baseline_quantity:,.1f}"
+                    )
+
+                # Break down overall business events by product and region
+                if anomaly_type in [
+                    "Overall Sales Drop",
+                    "Overall Sales Spike"
+                ]:
+                    event_transactions = df[
+                        (df["Date"] >= start_date)
+                        & (df["Date"] <= end_date)
+                    ]
+
+                    left, right = st.columns(2)
+
+                    with left:
+                        st.markdown("#### Sales by Product")
+                        product_breakdown = (
+                            event_transactions.groupby("Product_Name")["Sales"]
+                            .sum()
+                            .sort_values(ascending=False)
+                            .head(5)
+                        )
+                        st.bar_chart(product_breakdown, horizontal=True)
+
+                    with right:
+                        st.markdown("#### Sales by Region")
+                        region_breakdown = (
+                            event_transactions.groupby("Region")["Sales"]
+                            .sum()
+                            .sort_values(ascending=False)
+                        )
+                        st.bar_chart(region_breakdown)
+
+                # Show the exact daily records used in the investigation
+                with st.expander("View daily investigation data"):
+                    st.dataframe(
+                        detail_data,
+                        use_container_width=True,
+                        hide_index=True
+                    )
+
+                st.info(
+                    "The historical baseline is a comparison reference, "
+                    "not a guaranteed forecast. Review business context "
+                    "before deciding whether an event requires action."
+                )
+
 
         with st.expander("How does anomaly detection work?"):
             st.write(
