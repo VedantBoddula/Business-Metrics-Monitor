@@ -72,8 +72,10 @@ DATA_PATH = (
     / "ecommerce_business_monitoring_dataset.xlsx"
 )
 
-st.sidebar.subheader("📂 Dataset")
-
+st.sidebar.markdown("### 📁 Dataset")
+st.sidebar.caption(
+    "Default dataset: ecommerce_business_monitoring_dataset.xlsx"
+)
 uploaded_file = st.sidebar.file_uploader(
     "Upload your dataset",
     type=["csv", "xlsx", "xls"],
