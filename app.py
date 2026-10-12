@@ -1,6 +1,8 @@
+from src.column_mapping import auto_map_columns
 import streamlit as st
 import pandas as pd
 from pathlib import Path
+
 
 from src.preprocessing import (
     create_daily_data,
@@ -61,6 +63,8 @@ page = st.sidebar.radio(
     ]
 )
 
+
+
 # Load transaction data
 DATA_PATH = (
     Path(__file__).parent
@@ -68,23 +72,104 @@ DATA_PATH = (
     / "ecommerce_business_monitoring_dataset.xlsx"
 )
 
+st.sidebar.subheader("📂 Dataset")
+
+uploaded_file = st.sidebar.file_uploader(
+    "Upload your dataset",
+    type=["csv", "xlsx", "xls"],
+    help="Upload a CSV or Excel transaction dataset."
+)
+
+
 @st.cache_data
 def load_transactions(path):
     return pd.read_excel(path, sheet_name="Transactions")
 
+
+@st.cache_data
+def load_uploaded_transactions(file_bytes, filename):
+    
+    import io
+
+    file_obj = io.BytesIO(file_bytes)
+
+    if filename.lower().endswith(".csv"):
+        return pd.read_csv(file_obj)
+
+    return pd.read_excel(file_obj, sheet_name="Transactions")
+
+
+
+# Load and prepare transaction data
 try:
-    df = load_transactions(DATA_PATH)
+    if uploaded_file is not None:
+        raw_df = load_uploaded_transactions(
+            uploaded_file.getvalue(),
+            uploaded_file.name
+        )
+        st.sidebar.success("Uploaded dataset selected")
+    else:
+        raw_df = load_transactions(DATA_PATH)
 
+    # Map alternative column names to the standard names
+    df = auto_map_columns(raw_df)
+
+    required_columns = [
+        "Order_ID",
+        "Date",
+        "Product_Name",
+        "Category",
+        "Region",
+        "Quantity",
+        "Sales",
+        "Profit",
+    ]
+
+    missing_columns = [
+        column for column in required_columns
+        if column not in df.columns
+    ]
+
+    if missing_columns:
+        st.error(
+            "Dataset is missing required columns: "
+            + ", ".join(missing_columns)
+        )
+        st.stop()
+
+    # Convert columns to appropriate data types
     df["Date"] = pd.to_datetime(df["Date"], errors="coerce")
-    df["Sales"] = pd.to_numeric(df["Sales"], errors="coerce")
-    df["Profit"] = pd.to_numeric(df["Profit"], errors="coerce")
-    df["Quantity"] = pd.to_numeric(df["Quantity"], errors="coerce")
 
-    df = df.dropna(subset=["Date", "Sales", "Profit", "Quantity"])
+    for column in ["Sales", "Profit", "Quantity"]:
+        df[column] = pd.to_numeric(df[column], errors="coerce")
+
+    # Remove rows with missing critical values
+    df = df.dropna(
+        subset=[
+            "Order_ID",
+            "Date",
+            "Sales",
+            "Profit",
+            "Quantity",
+        ]
+    ).copy()
+
+    if df.empty:
+        st.error(
+            "No valid transaction records found. "
+            "Please check your dataset."
+        )
+        st.stop()
 
 except Exception as error:
     st.error(f"Could not load transaction data: {error}")
     st.stop()
+
+
+
+
+
+
 
 # Overview page
 if page == "Overview":
