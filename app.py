@@ -2,6 +2,9 @@ from src.column_mapping import auto_map_columns
 import streamlit as st
 import pandas as pd
 from pathlib import Path
+from src.email_alert import send_email_alert
+
+
 
 
 from src.preprocessing import (
@@ -375,8 +378,54 @@ elif page == "Anomaly Detection":
             "Start Date", ascending=False
         )
 
+
         
         
+        st.divider()
+        st.subheader("📧 Email Anomaly Report")
+
+        if st.button("📧 Send Email Alert"):
+            critical_count = (
+                results["Severity"] == "Critical"
+            ).sum()
+
+            high_count = (
+                results["Severity"] == "High"
+            ).sum()
+
+            moderate_count = (
+                results["Severity"] == "Moderate"
+            ).sum()
+
+            email_body = (
+                "Business Metrics Anomaly Report\n\n"
+                "Hello,\n\n"
+                "Business monitoring has detected unusual activity.\n\n"
+                f"Total anomalies: {len(results)}\n"
+                f"Critical: {critical_count}\n"
+                f"High: {high_count}\n"
+                f"Moderate: {moderate_count}\n\n"
+                "Please review the dashboard for further details.\n\n"
+                "Regards,\n"
+                "Business Metrics Monitor"
+            )
+
+            email_sent = send_email_alert(
+                subject="Business Metrics Anomaly Report",
+                body=email_body,
+            )
+
+            if email_sent:
+                st.success("Email sent successfully!")
+            else:
+                st.error(
+                    "Email could not be sent. "
+                    "Check your .env configuration and terminal."
+                )
+
+
+
+    
         
 
         col1, col2 = st.columns(2)
