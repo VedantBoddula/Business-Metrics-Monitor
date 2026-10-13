@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 from src.email_alert import send_email_alert
+from src.auth import admin_login, admin_logout
 
 
 
@@ -22,6 +23,12 @@ from src.anomaly_detector import (
     detect_profit_margin_drops,
     detect_regional_sales_drops
 )
+
+#login
+if not admin_login():
+    st.stop()
+
+admin_logout()
 
 # Page configuration
 st.set_page_config(
