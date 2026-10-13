@@ -1,3 +1,4 @@
+
 import os
 import smtplib
 from email.message import EmailMessage
@@ -6,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def send_email_alert(subject, body):
+def send_email_alert(subject, body, html_body=None):
     sender_email = os.getenv("EMAIL_ADDRESS")
     app_password = os.getenv("EMAIL_APP_PASSWORD")
     receiver_email = os.getenv("RECEIVER_EMAIL")
@@ -20,7 +21,13 @@ def send_email_alert(subject, body):
     message["From"] = sender_email
     message["To"] = receiver_email
     message["Subject"] = subject
+
+    # Plain-text fallback
     message.set_content(body)
+
+    # Add HTML version if provided
+    if html_body:
+        message.add_alternative(html_body, subtype="html")
 
     try:
         with smtplib.SMTP_SSL(
@@ -40,5 +47,3 @@ def send_email_alert(subject, body):
     except (smtplib.SMTPException, OSError) as error:
         print(f"Email sending failed: {type(error).__name__}: {error}")
         return False
-
-

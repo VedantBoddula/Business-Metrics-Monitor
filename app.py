@@ -404,6 +404,7 @@ elif page == "Anomaly Detection":
                 results["Severity"] == "Moderate"
             ).sum()
 
+            
             email_body = (
                 "Business Metrics Anomaly Report\n\n"
                 "Hello,\n\n"
@@ -412,14 +413,73 @@ elif page == "Anomaly Detection":
                 f"Critical: {critical_count}\n"
                 f"High: {high_count}\n"
                 f"Moderate: {moderate_count}\n\n"
-                "Please review the dashboard for further details.\n\n"
+                "Please visit the dashboard for detailed insights. "
+                "For extended monitoring or further analysis, feel free to contact us.\n\n"
                 "Regards,\n"
-                "Business Metrics Monitor"
+                "Business Metrics Monitor Team"
             )
+
+            html_body = f"""
+            <html>
+            <body style="margin:0;padding:24px;background:#f1f5f9;
+            font-family:Arial,sans-serif;color:#1e293b;">
+            <div style="max-width:560px;margin:auto;background:#ffffff;
+            border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
+
+                <div style="background:#172640;color:white;padding:24px;">
+                <h2 style="margin:0;">Business Metrics Anomaly Report</h2>
+                <p style="color:#cbd5e1;margin-bottom:0;">
+                    Automated Business Monitoring Alert
+                </p>
+                </div>
+
+                <div style="padding:24px;">
+                <p>Hello,</p>
+                <p>Unusual business activity has been detected by the monitoring system.</p>
+
+                <h3>Anomaly Summary</h3>
+
+                <table style="width:100%;border-collapse:collapse;">
+                    <tr>
+                    <td style="padding:12px;border-bottom:1px solid #e2e8f0;">
+                        Total Anomalies
+                    </td>
+                    <td style="padding:12px;text-align:right;">
+                        <b>{len(results)}</b>
+                    </td>
+                    </tr>
+                    <tr>
+                    <td style="padding:12px;color:#dc2626;">Critical</td>
+                    <td style="padding:12px;text-align:right;"><b>{critical_count}</b></td>
+                    </tr>
+                    <tr>
+                    <td style="padding:12px;color:#d97706;">High</td>
+                    <td style="padding:12px;text-align:right;"><b>{high_count}</b></td>
+                    </tr>
+                    <tr>
+                    <td style="padding:12px;color:#a16207;">Moderate</td>
+                    <td style="padding:12px;text-align:right;"><b>{moderate_count}</b></td>
+                    </tr>
+                </table>
+
+                <p style="margin-top:24px;line-height:1.6;">
+                    Please visit the dashboard for detailed insights.
+                    For extended monitoring or further analysis, feel free to contact us.
+                </p>
+
+                <p style="line-height:1.6;">
+                    Regards,<br><b>Business Metrics Monitor Team</b>
+                </p>
+                </div>
+            </div>
+            </body>
+            </html>
+            """
 
             email_sent = send_email_alert(
                 subject="Business Metrics Anomaly Report",
                 body=email_body,
+                html_body=html_body,
             )
 
             if email_sent:
@@ -429,8 +489,6 @@ elif page == "Anomaly Detection":
                     "Email could not be sent. "
                     "Check your .env configuration and terminal."
                 )
-
-
 
     
         
