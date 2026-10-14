@@ -148,46 +148,64 @@ h1, h2, h3, h4, h5, h6 {
     gap: 4px !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label {
+/* Radio Option Pills */
+[data-testid="stSidebar"] div[data-testid="stRadio"] label {
     background: transparent !important;
     border: none !important;
-    border-radius: 6px !important;
-    padding: 7px 10px !important;
-    margin: 0 !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    margin: 2px 0 !important;
     transition: all 0.15s ease !important;
     cursor: pointer !important;
     display: flex !important;
     align-items: center !important;
+    width: 100% !important;
 }
 
-/* Hide the clunky radio circle */
-[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label > div:first-child {
+/* Hide the clunky radio circle completely */
+[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-of-type,
+[data-testid="stSidebar"] div[data-testid="stRadio"] input[type="radio"] + div,
+[data-testid="stSidebar"] div[data-testid="stRadio"] input[type="radio"] ~ div:not([data-testid="stMarkdownContainer"]):first-of-type {
     display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] label p,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label span,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label div[data-testid="stMarkdownContainer"] p {
     color: #94A3B8 !important;
     font-size: 0.88rem !important;
     font-weight: 500 !important;
     margin: 0 !important;
-    padding-left: 4px !important;
+    padding: 0 !important;
+    line-height: 1.4 !important;
     transition: color 0.15s ease !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:hover {
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
     background: rgba(255, 255, 255, 0.06) !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:hover p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover p,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover span,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover div[data-testid="stMarkdownContainer"] p {
     color: #FFFFFF !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) {
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
     background: #1F5FD6 !important;
-    box-shadow: 0 1px 3px rgba(31, 95, 214, 0.3) !important;
+    box-shadow: 0 2px 6px rgba(31, 95, 214, 0.35) !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) span,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) div[data-testid="stMarkdownContainer"] p {
     color: #FFFFFF !important;
     font-weight: 600 !important;
 }
@@ -823,16 +841,19 @@ st.sidebar.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+NAV_ICONS = {
+    "Overview": "📊",
+    "Sales Analytics": "📈",
+    "Anomaly Detection": "🛡️",
+    "Business Impact": "💼",
+    "Alert History": "📋",
+}
+
 st.sidebar.markdown("##### Navigation")
 page = st.sidebar.radio(
     "Navigation",
-    [
-        "Overview",
-        "Sales Analytics",
-        "Anomaly Detection",
-        "Business Impact",
-        "Alert History",
-    ],
+    list(NAV_ICONS.keys()),
+    format_func=lambda x: f"{NAV_ICONS.get(x, '')}  {x}",
     label_visibility="collapsed",
 )
 
