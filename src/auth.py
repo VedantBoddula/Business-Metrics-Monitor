@@ -104,8 +104,13 @@ footer { display: none !important; }
     display: grid;
     place-items: center;
 }
-.hero-title {
-    color: #F4F7FB;
+.hero-title,
+h1.hero-title,
+[data-testid="stMarkdownContainer"] h1.hero-title,
+.st-key-login_shell [data-testid="column"]:first-child h1,
+.st-key-login_shell [data-testid="stColumn"]:first-child h1 {
+    color: #F4F7FB !important;
+    -webkit-text-fill-color: #F4F7FB !important;
     font-size: clamp(1.6rem, 2.6vw, 2.1rem);
     font-weight: 600;
     line-height: 1.22;
@@ -308,7 +313,7 @@ HERO_HTML = """
   </span>
   Business Metrics Monitor
 </div>
-<h1 class="hero-title">Catch unusual changes in your metrics early.</h1>
+<h1 class="hero-title" style="color: #F4F7FB !important; -webkit-text-fill-color: #F4F7FB !important;">Catch unusual changes in your metrics early.</h1>
 <p class="hero-text">
   Track key business numbers, see what moved outside the normal range,
   and send reports to your team.
