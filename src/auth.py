@@ -428,7 +428,7 @@ LOGOUT_CSS = """
 
 .st-key-logout_bar {
     position: fixed;
-    top: 10px;
+    top: 16px;
     right: 155px;
     z-index: 999999;
     width: auto;

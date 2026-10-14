@@ -139,11 +139,16 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Sidebar navigation - Sleek pill navigation */
+[data-testid="stSidebar"] div[data-testid="stRadio"] [data-testid="stWidgetLabel"],
+[data-testid="stSidebar"] div[data-testid="stRadio"] > label {
+    display: none !important;
+}
+
 [data-testid="stSidebar"] div[data-testid="stRadio"] > div {
     gap: 4px !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] label {
+[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label {
     background: transparent !important;
     border: none !important;
     border-radius: 6px !important;
@@ -156,11 +161,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Hide the clunky radio circle */
-[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child {
+[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label > div:first-child {
     display: none !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] label p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label p {
     color: #94A3B8 !important;
     font-size: 0.88rem !important;
     font-weight: 500 !important;
@@ -169,20 +174,20 @@ h1, h2, h3, h4, h5, h6 {
     transition: color 0.15s ease !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover {
+[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:hover {
     background: rgba(255, 255, 255, 0.06) !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:hover p {
     color: #FFFFFF !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) {
+[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) {
     background: #1F5FD6 !important;
     box-shadow: 0 1px 3px rgba(31, 95, 214, 0.3) !important;
 }
 
-[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] div[role="radiogroup"] label:has(input:checked) p {
     color: #FFFFFF !important;
     font-weight: 600 !important;
 }
@@ -449,6 +454,14 @@ div[data-testid="stMetric"] [data-testid="stMetricDelta"] * {
 }
 
 /* Sign out button top bar */
+.st-key-logout_bar {
+    position: fixed;
+    top: 16px;
+    right: 155px;
+    z-index: 999999;
+    width: auto;
+}
+
 .st-key-logout_bar button {
     background: #FFFFFF !important;
     border: 1px solid #CBD5E1 !important;
@@ -812,7 +825,7 @@ st.sidebar.markdown("""
 
 st.sidebar.markdown("##### Navigation")
 page = st.sidebar.radio(
-    "Navigation Menu",
+    "Navigation",
     [
         "Overview",
         "Sales Analytics",
