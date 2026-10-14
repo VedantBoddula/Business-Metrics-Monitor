@@ -149,6 +149,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Radio Option Pills */
+[data-testid="stSidebar"] label[data-baseweb="radio"],
 [data-testid="stSidebar"] div[data-testid="stRadio"] label {
     background: transparent !important;
     border: none !important;
@@ -160,31 +161,39 @@ h1, h2, h3, h4, h5, h6 {
     display: flex !important;
     align-items: center !important;
     width: 100% !important;
+    box-sizing: border-box !important;
 }
 
-/* Hide the clunky radio circle completely */
-[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child,
-[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-of-type,
-[data-testid="stSidebar"] div[data-testid="stRadio"] input[type="radio"] + div,
-[data-testid="stSidebar"] div[data-testid="stRadio"] input[type="radio"] ~ div:not([data-testid="stMarkdownContainer"]):first-of-type {
+/* Hide ONLY the radio circle (first-child div) */
+[data-testid="stSidebar"] label[data-baseweb="radio"] > div:first-child,
+[data-testid="stSidebar"] div[data-testid="stRadio"] label > div:first-child:not(:has([data-testid="stMarkdownContainer"])) {
     display: none !important;
     width: 0 !important;
     height: 0 !important;
     opacity: 0 !important;
     visibility: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
+}
+
+/* Ensure the label text container is always visible and flexed */
+[data-testid="stSidebar"] label[data-baseweb="radio"] > div:last-child,
+[data-testid="stSidebar"] div[data-testid="stRadio"] [data-testid="stMarkdownContainer"] {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    visibility: visible !important;
 }
 
 [data-testid="stSidebar"] div[data-testid="stRadio"] label p,
 [data-testid="stSidebar"] div[data-testid="stRadio"] label span,
-[data-testid="stSidebar"] div[data-testid="stRadio"] label div[data-testid="stMarkdownContainer"] p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] [data-testid="stMarkdownContainer"] p {
     color: #94A3B8 !important;
-    font-size: 0.88rem !important;
+    font-size: 0.9rem !important;
     font-weight: 500 !important;
     margin: 0 !important;
     padding: 0 !important;
     line-height: 1.4 !important;
+    display: block !important;
+    visibility: visible !important;
     transition: color 0.15s ease !important;
 }
 
@@ -194,7 +203,7 @@ h1, h2, h3, h4, h5, h6 {
 
 [data-testid="stSidebar"] div[data-testid="stRadio"] label:hover p,
 [data-testid="stSidebar"] div[data-testid="stRadio"] label:hover span,
-[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover div[data-testid="stMarkdownContainer"] p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:hover [data-testid="stMarkdownContainer"] p {
     color: #FFFFFF !important;
 }
 
@@ -205,7 +214,7 @@ h1, h2, h3, h4, h5, h6 {
 
 [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) p,
 [data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) span,
-[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) div[data-testid="stMarkdownContainer"] p {
+[data-testid="stSidebar"] div[data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"] p {
     color: #FFFFFF !important;
     font-weight: 600 !important;
 }
