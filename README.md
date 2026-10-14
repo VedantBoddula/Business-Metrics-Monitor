@@ -253,6 +253,15 @@ python evaluate_detector.py
 -   Improve anomaly evaluation using reliable labeled data.
 -   Support additional data sources and configurable business metrics.
 
+### 🔐 Demo Access
+
+Try the live application using the demo credentials below.
+
+- **Username:** `VedantBoddula`
+- **Password:** `Ved@123`
+
+
+
 ## 👨‍💻 Author
 
 **Vedant Boddula**\
