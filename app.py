@@ -77,8 +77,8 @@ st.markdown("""
 }
 
 /* Page canvas & typography */
-html, body, [class*="css"], .stApp {
-    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+html, body, .stApp {
+    font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--canvas) !important;
     color: #0F172A !important;
 }
