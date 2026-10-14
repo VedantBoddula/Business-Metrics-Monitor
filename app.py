@@ -449,9 +449,38 @@ div[data-testid="stMetric"] [data-testid="stMetricDelta"] * {
 }
 
 /* Sign out button top bar */
+.st-key-logout_bar button {
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 6px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 0 12px !important;
+    box-shadow: 0 1px 2px rgba(14, 26, 43, 0.04) !important;
+}
+
+.st-key-logout_bar button,
 .st-key-logout_bar button p,
-.st-key-logout_bar button span {
-    color: #F4F7FB !important;
+.st-key-logout_bar button span,
+.st-key-logout_bar button * {
+    color: #0E1A2B !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
+}
+
+.st-key-logout_bar button:hover {
+    background: #FEF2F2 !important;
+    border-color: #FCA5A5 !important;
+}
+
+.st-key-logout_bar button:hover,
+.st-key-logout_bar button:hover p,
+.st-key-logout_bar button:hover span,
+.st-key-logout_bar button:hover * {
+    color: #DC2626 !important;
 }
 
 /* Clean, proportionate expanders */

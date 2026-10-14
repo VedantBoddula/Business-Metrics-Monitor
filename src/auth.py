@@ -21,6 +21,7 @@ load_dotenv(override=True)
 LOGIN_CSS = """
 <style>
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
 
 :root {
     --ink: #0E1A2B;
@@ -34,7 +35,7 @@ LOGIN_CSS = """
     --alert: #F2A33A;
 }
 
-html, body, .stApp, .stApp * {
+html, body, .stApp {
     font-family: 'IBM Plex Sans', -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -203,11 +204,33 @@ div[data-testid="stTextInput"] input {
     background: transparent !important;
     font-size: 0.95rem;
 }
-div[data-testid="stTextInput"] input::placeholder {
-    color: #8A98AD !important;
-    -webkit-text-fill-color: #8A98AD !important;
+div[data-testid="stTextInput"] button {
+    color: var(--muted) !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 8px !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
-div[data-testid="stTextInput"] button { color: var(--muted) !important; }
+div[data-testid="stTextInput"] button * {
+    font-family: 'Material Symbols Rounded', 'Material Icons', sans-serif !important;
+    font-size: 20px !important;
+    font-style: normal !important;
+    letter-spacing: normal !important;
+    line-height: 1 !important;
+    text-transform: none !important;
+    white-space: nowrap !important;
+    word-wrap: normal !important;
+    direction: ltr !important;
+    -webkit-font-feature-settings: 'liga' !important;
+    -webkit-font-smoothing: antialiased !important;
+}
+div[data-testid="stTextInput"] button:hover {
+    color: var(--accent) !important;
+}
 [data-testid="InputInstructions"] { display: none !important; }
 
 /* Submit button */
@@ -396,30 +419,43 @@ LOGOUT_CSS = """
 .st-key-logout_bar {
     position: fixed;
     top: 10px;
-    right: 64px;
+    right: 155px;
     z-index: 999999;
     width: auto;
 }
 .st-key-logout_bar button {
-    background: #16263D;
-    border: 1px solid #2E4468;
-    border-radius: 8px;
-    min-height: 36px;
-    padding: 0 16px;
-    transition: background-color .15s ease, border-color .15s ease;
+    background: #FFFFFF !important;
+    border: 1px solid #CBD5E1 !important;
+    border-radius: 6px !important;
+    min-height: 28px !important;
+    height: 28px !important;
+    padding: 0 10px !important;
+    box-shadow: 0 1px 2px rgba(14, 26, 43, 0.04) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.15s ease !important;
 }
-.st-key-logout_bar button p {
-    color: #F4F7FB;
-    font-size: 0.88rem;
-    font-weight: 500;
+.st-key-logout_bar button p,
+.st-key-logout_bar button span {
+    color: #0E1A2B !important;
+    font-size: 0.8rem !important;
+    font-weight: 600 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1 !important;
 }
 .st-key-logout_bar button:hover {
-    background: #1F5FD6;
-    border-color: #1F5FD6;
+    background: #FEF2F2 !important;
+    border-color: #FCA5A5 !important;
+}
+.st-key-logout_bar button:hover p,
+.st-key-logout_bar button:hover span {
+    color: #DC2626 !important;
 }
 .st-key-logout_bar button:focus-visible {
-    outline: 3px solid rgba(31, 95, 214, .45);
-    outline-offset: 2px;
+    outline: 2px solid rgba(220, 38, 38, .35) !important;
+    outline-offset: 1px !important;
 }
 </style>
 """
